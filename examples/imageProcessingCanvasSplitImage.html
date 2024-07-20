@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Color picker | Canvas pixel manipulation</title>
+
+    <style>
+        .color-cell {
+            color: white;
+            text-align: center;
+        }
+
+        th {
+            width: 150px;
+        }
+
+        #canvas {
+            display: none;
+        }
+    </style>
+
+</head>
+
+<body>
+    <canvas id="canvas" width="1200" height="800"></canvas>
+    <table>
+        <thead>
+            <tr>
+                <th>Source</th>
+                <th>Hovered color</th>
+                <th>Selected color</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <canvas id="canvas1" width="400" height="300"></canvas>
+                </td>
+                <td>
+                    <canvas id="canvas2" width="400" height="300"></canvas>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <canvas id="canvas3" width="400" height="300"></canvas>
+                </td>
+                <td>
+                    <canvas id="canvas4" width="400" height="300"></canvas>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <!-- <script src="color-picker.js"></script> -->
+</body>
+<script type="text/javascript">
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = 'https://www.shutterstock.com/shutterstock/videos/1091851087/thumb/8.jpg?ip=x480';
+    // img.src="https://rukminim2.flixcart.com/image/850/1000/xif0q/reflector/d/g/u/wsgreen6thick812-windrop-solutions-original-imaggsh3ymrh3gjv.jpeg?q=20&crop=false"
+    img.src = 'https://cdn.pixabay.com/photo/2022/02/15/13/00/building-7014904_1280.jpg';
+
+    const canvas = document.getElementById('canvas');
+    const canvas1 = document.getElementById('canvas1');
+    const canvas2 = document.getElementById('canvas2');
+    const canvas3 = document.getElementById('canvas3');
+    const canvas4 = document.getElementById('canvas4');
+
+    const ctx = canvas.getContext('2d');
+    const ctx1 = canvas1.getContext('2d');
+    const ctx2 = canvas2.getContext('2d');
+    const ctx3 = canvas3.getContext('2d');
+    const ctx4 = canvas4.getContext('2d');
+
+    img.addEventListener('load', () => {
+        ctx.drawImage(img, 0, 0);
+        img.style.display = 'none';
+    });
+
+
+    function split() {
+        const quarterW = img.width/4 + 100;
+        const quarterH = img.height/4 + 100;
+        const frame1 = ctx.getImageData(0, 0, quarterW, quarterH);
+        const frame2 = ctx.getImageData(quarterW, 0, quarterW, quarterH);
+        const frame3 = ctx.getImageData(0, quarterH, quarterW, quarterH);
+        const frame4 = ctx.getImageData(quarterW, quarterH, quarterW * 2 , quarterH * 2);
+
+        ctx1.putImageData(frame1, 0, 0);
+        ctx2.putImageData(frame2, 0, 0);
+        ctx3.putImageData(frame3, 0, 0);
+        ctx4.putImageData(frame4, 0, 0);
+
+        // const frame2 = ctx2.getImageData(0, 0, img2.width, img2.height);
+        // const imgData2 = frame2.data;
+
+    }
+    console.log(img.width, img.height)
+
+</script>
+    <button type="button" onClick="split()">Split</button>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<canvas id="myCanvas" width="800" height="800" style="border:1px solid #d3d3d3;">
+Your browser does not support the HTML canvas tag.</canvas>
+
+<script>
+    var c = document.getElementById("myCanvas");
+    var ctx = c.getContext("2d");
+
+    const width=800;
+    const height=800;
+    const cellSize=5;
+    const rows=height/cellSize;
+    const cols=width/cellSize;
+    const cells = rows * cellSize;
+    let grid = new Array(rows).fill(0).map(() => new Array(cols).fill(0));
+    let updatedGrid = new Array(rows).fill(0).map(() => new Array(cols).fill(0));
+    let x1 = 0, y1=cellSize;
+    let x2 = rows * cellSize, y2=cellSize;
+// console.log(grid)
+// console.log(rows, cols, cells)
+
+    // for(let i=0;i<rows;i++) {        
+    //     // ctx.moveTo(x1, y1 + cellSize * i);
+    //     // ctx.lineTo(x2, y2 + cellSize * i);
+    //     let coords = { x1, y1: y1 + cellSize * i, x2, y2: y2 + cellSize * i}
+    //     console.log(coords)
+    //     // ctx.strokeStyle = "rgb(255, 0, 0)";
+    //     // ctx.stroke();
+    // }
+
+
+    ctx.moveTo(0, cellSize);
+    ctx.lineTo(0, cellSize * 0);
+
+    // for(let i=0;i<cols;i++) {
+    //     // ctx.moveTo(cellSize * i, cellSize * 0);
+    //     // ctx.lineTo(cellSize * i, cellSize * cols);
+
+    //     let coords = { x1: cellSize * i, y1: cellSize * 0, x2: cellSize * i, y2: cellSize * cols}
+    //     console.log(coords)
+    // }
+
+    // ctx.stroke();
+let cellFill;
+    const paintSandParticle = (x, y, fill = "red" ) => {
+        ctx.beginPath();
+        ctx.rect(x * cellSize, y * cellSize, cellSize, cellSize);
+        ctx.fillStyle = fill;
+        ctx.fill();
+        // ctx.stroke();
+    }
+
+    function getRandomArbitrary(min, max) {
+        return Math.random() * (max - min) + min;
+    }
+    let mid = Math.floor(cols/2);
+    grid[mid][0] = 1;
+
+    let x=mid, y=0, prev=0;
+
+    function sandSimulationWithReccursion(grid, x, y) {
+        /**
+         * 1. on init - if current is zero, set to non-zero and move to next
+         * 2. if next is zero and boudary hasn't reached move next
+         * 3. if next is non-zero check left or right and #1
+         */
+        if(!grid[x][y] && y < grid[x].length) {
+            grid[x][y] = 1;
+            if(y > 0) {
+                grid[x][y-1] = 0;                
+            }
+            return sandSimulationWithReccursion(grid, x, y + 1)
+        }
+         if(!grid[x][y+1] && (y + 1) < grid[x].length) {
+            grid[x][y] = 0;
+            grid[x][y+1] = 1;
+            return sandSimulationWithReccursion(grid, x, y + 1)
+         } else if(y >= grid[x].length) {
+            //  console.log('boundary reached')
+             return grid;
+         } else {
+            // console.log('elseeeee move left or right')
+            grid[x][y-1] = 0;
+             if((x + 1) < grid.length && !grid[x + 1][y]) {
+                 return sandSimulationWithReccursion(grid, x + 1, y)
+             } else if (x > 0 && !grid[x-1][y]) {
+                 return sandSimulationWithReccursion(grid, x - 1, y)                 
+             } else {
+                // console.log('no left no right set current', x, y)
+                 if(y > 0) {                 
+                    grid[x][y-1] = 1;
+                 }
+             }
+         }
+
+        return grid;
+    }
+let red = 0;
+let green = 80;
+let blue = 90;
+
+function setRandomX() {    
+    x = Math.floor(getRandomArbitrary(0,cols))
+
+    const r = Math.floor(getRandomArbitrary(0,255))
+    const g = Math.floor(getRandomArbitrary(0,255))
+    const b = Math.floor(getRandomArbitrary(0,255))
+    cellFill = `rgb(${r}, ${g}, ${b})`;
+}
+    function addPixel(x, y) {
+        grid = sandSimulationWithReccursion(grid, x, y)
+        renderPixel(x, y)
+    }
+
+    function addPixelWithDelay(x, y) {
+        grid = sandSimulationWithReccursion(grid, x, y)
+        renderPixel(x, y)
+    }
+
+    function renderPixel(x, y) {
+        for(let i=0;i<rows;i++) {
+            for(let j=0;j<cols;j++) {
+                if(grid[i][j] === 1 && updatedGrid[i][j] !== grid[i][j]) {
+                    red = 255 % (x + j);
+                    green = 255 % (y + i);
+                    blue = 255 % (x + y + i + j);
+                    paintSandParticle(i, j, `rgb(${red}, ${green}, ${blue})`);
+                }
+                updatedGrid[i][j] = grid[i][j];
+            }
+        }
+    }
+    window.addEventListener('mousemove', (evt) => {
+        const { clientX, clientY} = evt;
+        // console.log(clientX, clientY)
+        const deviation = Math.floor(getRandomArbitrary(-1,2))
+        if(clientX < 800 && clientY < 800) {
+            const x = Math.floor(clientX/cellSize) + (deviation)
+            const y = Math.floor(clientY/cellSize)
+            addPixel(x + (deviation * 2), y)
+            addPixel(x - (deviation * 3), y)
+            addPixel(x + (deviation * 2), y)
+            addPixel(x - (deviation * 4), y)
+            addPixel(x + (deviation), y)
+            addPixel(x - (deviation * 4), y)
+            addPixel(x + (deviation * 2), y)
+            addPixel(x - (deviation * 3), y)
+            addPixel(x + (deviation), y)
+            addPixel(x - (deviation * 4), y)
+            addPixel(x + (deviation * 2), y)
+            addPixel(x - (deviation * 3), y)
+            addPixel(x + (deviation), y)
+
+            addPixel(x - (deviation * 4), y)
+            addPixel(x + (deviation * 2), y)
+            addPixel(x - (deviation * 3), y)
+            addPixel(x + (deviation), y)
+
+        }
+    })
+    window.addEventListener('click', (evt) => {
+        const { clientX, clientY} = evt;
+        // console.log(clientX, clientY)
+        const deviation = Math.floor(getRandomArbitrary(-1,2))
+        if(clientX < 800 && clientY < 800) {
+            addPixel(Math.floor(clientX/cellSize) + (deviation * 3), Math.floor(clientY/cellSize))
+            addPixel(Math.floor(clientX/cellSize) - (deviation * 2), Math.floor(clientY/cellSize))
+            addPixel(Math.floor(clientX/cellSize) - (deviation * 3), Math.floor(clientY/cellSize))
+            addPixel(Math.floor(clientX/cellSize) + (deviation * 4), Math.floor(clientY/cellSize))
+        }
+    })
+
+</script>
+    <input type="button" value="Start" onclick="addPixel()">
+    <input type="button" value="Start" onmousemove="addPixel()">
+    <input type="button" value="RandomX" onclick="setRandomX()">
+</body>
+</html>
+
+<!-- // no left, right stay there
+[
+    [0,0,0,0,0],
+    [0,0,0,0,1],
+    [0,0,0,1,1],
+    [0,0,0,0,1],
+    [0,0,0,0,0],
+]
+
+// move to left or right
+[
+    [0,0,0,0,0],
+    [0,0,0,0,1],
+    [0,0,1,1,1],
+    [0,0,0,0,1],
+    [0,0,0,0,0],
+]
+
+[
+    [0,0,0,0,0],
+    [0,0,0,0,1],
+    [0,0,0,1,1],
+    [0,0,0,1,1],
+    [0,0,0,0,0],
+]
+// if can't move next check for left and right and move to available space
+[
+    [0,0,0,0,0],
+    [0,0,0,0,1],
+    [0,0,0,1,1],
+    [0,0,0,0,1],
+    [0,0,0,0,1],
+] -->

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<style>
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-top: 50px;
+    }
+
+    .two-columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+    }
+
+    .line-container {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding-top: 100px;
+    }
+
+    svg, canvas {
+        border: 2px solid rgb(62, 99, 234);
+    }
+
+    .flex-col {
+        display: flex;
+        flex-direction: column;
+    }
+</style>
+<body>
+    <main>
+        <h2>Svg Line vs Canvas Line</h2>
+        <canvas id="canvas" width="800" height="800" style="border:1px solid #d3d3d3;">
+            Your browser does not support the HTML canvas tag.</canvas>
+    </main>
+
+    <script>
+        var canvas = document.getElementById('canvas');
+        var ctx = canvas.getContext('2d');
+
+        function drawLine(x1, y1, x2, y2, color) {
+            ctx.beginPath()
+            ctx.moveTo(x1, y1)
+            ctx.lineTo(x2, y2)
+            ctx.strokeStyle = color;
+            ctx.stroke();
+            ctx.closePath()
+        }
+
+        function drawCircle(x1, y1, x2, y2, color) {
+            ctx.beginPath()
+            ctx.fillStyle = color;
+            ctx.arc(x1, y1, x2, y2, 2 * Math.PI);
+
+            ctx.fill();
+            ctx.closePath()
+        }
+
+        function drawRect(x, y) {
+            ctx.beginPath();
+            ctx.fillStyle = 'green';
+            ctx.fillRect(x - 20, y - 15, 40, 20);
+            ctx.stroke();
+        }
+        function any2dShape(x, y, sides = 2, rx = 0, ry = 0, r, rect = false) {
+            let px = 0, py = 0;
+            let thetaInc = (sides / 2)
+            let radianInc = Math.PI / thetaInc;
+            let count = 0;
+            for (let i = 0; i <= Math.PI * 2; i += radianInc) {
+                let dx = x + r * Math.cos(i + rx);
+                let dy = y + r * Math.sin(i + ry);
+                drawLine(x, y, dx, dy, "green")
+count++
+                if (px && py) {
+                    drawLine(px, py, dx, dy, count % 2 >= 0.5 ? "green":"green")
+                    if(rect)
+                        drawRect(dx, dy)
+                    else 
+                        drawCircle(px, py, 4, 0, count % 2 >= 0.5 ? "green":"red")
+                    // any2dShape(px, py, 3, dx, dy);
+                }
+                px = dx;
+                py = dy;
+            }
+        }
+        function clearScreen() {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            ctx.beginPath();
+        }
+
+        let r = 300;
+        let rx = 0;
+        let ry = 0;
+        let sides= 40;
+        setInterval(() => {
+            clearScreen();
+            // rx += 0.01 + Math.PI/80
+            // ry += 0.01 + Math.PI/200
+            rx += 0.01
+            ry += 0.01
+            any2dShape(400, 400, sides, rx, ry, r, true);
+            any2dShape(400, 400, sides, rx, ry, 150);
+        }, 1000/60)
+        // any2dShape(400, 400, sides, rx, ry);
+
+    </script>
+</body>
+
+</html>

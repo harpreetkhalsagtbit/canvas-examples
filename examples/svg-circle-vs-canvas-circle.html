@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<style>
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-top: 50px;
+    }
+
+    .two-columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+    }
+
+    .line-container {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding-top: 100px;
+    }
+
+    svg, canvas {
+        border: 2px solid rgb(62, 99, 234);
+    }
+
+    .flex-col {
+        display: flex;
+        flex-direction: column;
+    }
+</style>
+<body>
+    <main>
+        <h2>Svg Line vs Canvas Line</h2>
+        <div class="container">
+            <div class="two-columns">
+                <script src="https://gist.github.com/harpreetkhalsagtbit/6daad81c0eacc84fe30813ece7597a1a.js"></script>
+                <script src="https://gist.github.com/harpreetkhalsagtbit/d4d4495d405b72492c81d222299f2219.js"></script>
+            </div>
+        </div>
+        <div  class="line-container">
+            <div class="flex-col">
+                <label>SVG</label>
+                <svg width="200" height="200">
+                    <circle r="50" cx="100" cy="100" stroke="red" stroke-width="2" />
+                </svg>
+            </div>
+            <div class="flex-col">
+                <label>SVG Scaled (check boundaries)</label>
+                <svg width="200" height="200">
+                    <circle r="50" cx="100" cy="100" stroke="red" stroke-width="2" transform="matrix(2,0,0,2,-100,-100)"/>
+                </svg>
+            </div>
+            <div class="flex-col">
+                <label>Canvas</label>
+                <canvas id="canvas" width="200" height="200"></canvas>
+            </div>
+            <div class="flex-col">
+                <label>Canvas Scaled (check boundaries)</label>
+                <canvas id="canvas2" width="200" height="200"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        var canvas = document.getElementById('canvas');
+        var ctx = canvas.getContext('2d');
+        var canvas2 = document.getElementById('canvas2');
+        var ctx2 = canvas2.getContext('2d');
+        function drawCircle(x1, y1, x2, y2, color) {
+            ctx.beginPath()
+            ctx.arc(100, 100, 50, 0, 2 * Math.PI);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = color;
+
+            ctx.stroke();
+            ctx.closePath()
+        }
+
+        drawCircle(50, 50, 150, 150, "red")
+
+        function drawCircle2(x1, y1, x2, y2, color) {
+            var cx = canvas2.width / 2;
+            var cy = canvas2.height / 2;
+
+            // Define the scaling factor
+            var scale = 20;
+            ctx2.arc(100, 100, 50, 0, 2 * Math.PI);
+            ctx2.lineWidth = 1;
+            ctx2.strokeStyle = color;
+            ctx2.transform(scale, 0, 0, scale, cx - scale * cx, cy - scale * cy);
+
+            ctx2.stroke();
+            ctx2.closePath()
+        }
+
+        drawCircle2(50, 50, 150, 150, "red")
+
+</script>
+</body>
+
+</html>

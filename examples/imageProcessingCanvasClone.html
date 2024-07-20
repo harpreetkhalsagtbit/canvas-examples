@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Color picker | Canvas pixel manipulation</title>
+
+    <style>
+        .color-cell {
+            color: white;
+            text-align: center;
+        }
+
+        th {
+            width: 150px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>Source</th>
+                <th>Hovered color</th>
+                <th>Selected color</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <canvas id="canvas" width="900" height="500"></canvas>
+                </td>
+                <td class="color-cell" id="hovered-color"></td>
+                <td class="color-cell" id="selected-color"></td>
+                <td>
+                    <canvas id="canvas2" width="900" height="500"></canvas>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <!-- <script src="color-picker.js"></script> -->
+</body>
+<script type="text/javascript">
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = 'https://www.shutterstock.com/shutterstock/videos/1091851087/thumb/8.jpg?ip=x480';
+    // img.src="https://rukminim2.flixcart.com/image/850/1000/xif0q/reflector/d/g/u/wsgreen6thick812-windrop-solutions-original-imaggsh3ymrh3gjv.jpeg?q=20&crop=false"
+    img.src = 'https://cdn.pixabay.com/photo/2022/02/15/13/00/building-7014904_1280.jpg';
+
+    const img2 = new Image();
+    img2.crossOrigin = 'anonymous';
+    img2.src="https://media.istockphoto.com/id/1351651339/video/smiling-man-with-arms-crossed-over-green-background.jpg?s=640x640&k=20&c=818Lwpd4-JxtTOeZWSSZlDray0oLp8IcM8h3ycM3A3Y="
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    img.addEventListener('load', () => {
+        ctx.drawImage(img, 0, 0);
+        img.style.display = 'none';
+    });
+    const hoveredColor = document.getElementById('hovered-color');
+    // const selectedColor = document.getElementById('selected-color');
+
+    const canvas2 = document.getElementById('canvas2');
+    const ctx2 = canvas2.getContext('2d');
+    img2.addEventListener('load', () => {
+        ctx2.drawImage(img2, 0, 0);
+        img2.style.display = 'none';
+    });
+
+
+    function pick(event, destination) {
+        const bounding = canvas.getBoundingClientRect();
+        const x = event.clientX - bounding.left;
+        const y = event.clientY - bounding.top;
+        const pixel = ctx.getImageData(x, y, 100, 100);
+        const data = pixel.data;
+        console.log(x, y, data)
+// console.log(data)
+        const rgba = `rgba(${data[0]}, ${data[1]}, ${data[2]}, ${data[3] / 255})`;
+        destination.style.background = rgba;
+        destination.textContent = rgba;
+
+        const pixel2 = ctx2.getImageData(x, y, 100, 100);
+        const imgData = pixel2.data;
+        for(i=0;i<100;i++) {
+            imgData[i] = data[i];
+        }
+
+        // ctx2.putImageData(pixel2, x, y);
+        ctx2.putImageData(pixel, x, y);
+
+        return rgba;
+    }
+
+    function resetClicked(event) {
+        const bounding = canvas.getBoundingClientRect();
+        const x = event.clientX - bounding.left;
+        const y = event.clientY - bounding.top;
+        const pixel = ctx.getImageData(x, y, 1, 1);
+        const data = pixel.data;
+// console.log(data)
+        const rgba = `rgba(${data[0]}, ${data[1]}, ${data[2]}, ${data[3] / 255})`;
+console.log(rgba)
+        const frame = ctx.getImageData(0, 0, img.width, img.height);
+        const imgData = frame.data;
+        for (let i = 0; i < imgData.length; i += 4) {
+            const red = imgData[i + 0];
+            const green = imgData[i + 1];
+            const blue = imgData[i + 2];
+            // if (green > 150 && red > 150 && blue < 150) {
+            // imgData[i + 3] = 0;
+            // }
+
+            // if (red == data[0]) {
+            //     imgData[i + 0] = 255;
+            // }
+            // if (green == data[1]) {
+            //     imgData[i + 1] = 255;
+            // }
+            // if (blue == data[2]) {
+            //     imgData[i + 2] = 255;
+            // }
+
+            // if (red == data[0] || green == data[1] || blue == data[2]) {
+            // if(green>=219 || red<20 || blue<20) {
+            if (green > red && green > blue) {
+                imgData[i + 0] = 255;
+                imgData[i + 1] = 255;
+                imgData[i + 2] = 255;
+            }
+
+        }
+        ctx.putImageData(frame, 0, 0);
+        return rgba;
+    }
+    canvas.addEventListener('mousemove', event => pick(event, hoveredColor));
+    // canvas.addEventListener('click', event => pick(event, selectedColor));
+    // canvas.addEventListener('click', event => resetClicked(event));
+</script>
+
+</html>
