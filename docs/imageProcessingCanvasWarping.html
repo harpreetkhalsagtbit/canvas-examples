@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selective Colorization</title>
+    <script src="
+https://cdn.jsdelivr.net/npm/mathjs@13.0.1/lib/browser/math.min.js
+"></script>
+</head>
+
+<body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <script type="text/javascript">
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.src = 'https://www.shutterstock.com/shutterstock/videos/1091851087/thumb/8.jpg?ip=x480';
+        // img.src="https://rukminim2.flixcart.com/image/850/1000/xif0q/reflector/d/g/u/wsgreen6thick812-windrop-solutions-original-imaggsh3ymrh3gjv.jpeg?q=20&crop=false"
+        img.src = 'https://cdn.pixabay.com/photo/2022/02/15/13/00/building-7014904_1280.jpg';
+
+        img.onload = function () {
+            const width = canvas.width;
+            const height = canvas.height;
+
+            // Coordinates of the original image
+            const src = [
+                { x: 0, y: 0 },
+                { x: img.width, y: 0 },
+                { x: img.width, y: img.height },
+                { x: 0, y: img.height }
+            ];
+
+            // Coordinates of the warped image
+            const dst = [
+                { x: 100, y: 50 },
+                { x: width - 100, y: 0 },
+                { x: width - 50, y: height - 100 },
+                { x: 50, y: height - 50 }
+            ];
+
+            warpImage(img, src, dst);
+        };
+
+        function warpImage(img, src, dst) {
+            const triangles = [
+                [src[0], src[1], src[2]],
+                [src[2], src[3], src[0]],
+                [dst[0], dst[1], dst[2]],
+                [dst[2], dst[3], dst[0]]
+            ];
+
+            for (let i = 0; i < 2; i++) {
+                const s = triangles[i];
+                const d = triangles[i + 2];
+                const t = getTransform(s, d);
+                ctx.setTransform(...t);
+                ctx.beginPath();
+                ctx.moveTo(d[0].x, d[0].y);
+                ctx.lineTo(d[1].x, d[1].y);
+                ctx.lineTo(d[2].x, d[2].y);
+                ctx.closePath();
+                ctx.clip();
+                ctx.drawImage(img, 0, 0);
+                ctx.resetTransform();
+            }
+        }
+
+        function getTransform(src, dst) {
+            const m = [
+                [src[0].x, src[0].y, 1, 0, 0, 0, -dst[0].x * src[0].x, -dst[0].x * src[0].y],
+                [0, 0, 0, src[0].x, src[0].y, 1, -dst[0].y * src[0].x, -dst[0].y * src[0].y],
+                [src[1].x, src[1].y, 1, 0, 0, 0, -dst[1].x * src[1].x, -dst[1].x * src[1].y],
+                [0, 0, 0, src[1].x, src[1].y, 1, -dst[1].y * src[1].x, -dst[1].y * src[1].y],
+                [src[2].x, src[2].y, 1, 0, 0, 0, -dst[2].x * src[2].x, -dst[2].x * src[2].y],
+                [0, 0, 0, src[2].x, src[2].y, 1, -dst[2].y * src[2].x, -dst[2].y * src[2].y]
+            ];
+            const a = math.inv(m);
+            const b = [
+                dst[0].x, dst[0].y,
+                dst[1].x, dst[1].y,
+                dst[2].x, dst[2].y
+            ];
+            const t = math.multiply(a, b).map(v => v / t[8]);
+            return [t[0], t[1], t[2], t[3], t[4], t[5], 0, 0, 1];
+        }
+
+    </script>
+</body>
+
+</html>

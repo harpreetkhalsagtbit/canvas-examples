@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Color picker | Canvas pixel manipulation</title>
+
+    <style>
+        .color-cell {
+            color: white;
+            text-align: center;
+        }
+
+        th {
+            width: 150px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>Source</th>
+                <th>Hovered color</th>
+                <th>Selected color</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <canvas id="canvas" width="900" height="500"></canvas>
+                </td>
+                <td class="color-cell" id="hovered-color"></td>
+                <td class="color-cell" id="selected-color"></td>
+                <td>
+                    <canvas id="canvas2" width="900" height="500"></canvas>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <!-- <script src="color-picker.js"></script> -->
+</body>
+<script type="text/javascript">
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = 'https://www.shutterstock.com/shutterstock/videos/1091851087/thumb/8.jpg?ip=x480';
+    // img.src="https://rukminim2.flixcart.com/image/850/1000/xif0q/reflector/d/g/u/wsgreen6thick812-windrop-solutions-original-imaggsh3ymrh3gjv.jpeg?q=20&crop=false"
+    img.src = 'https://cdn.pixabay.com/photo/2022/02/15/13/00/building-7014904_1280.jpg';
+
+    const img2 = new Image();
+    img2.crossOrigin = 'anonymous';
+    img2.src="https://media.istockphoto.com/id/1351651339/video/smiling-man-with-arms-crossed-over-green-background.jpg?s=640x640&k=20&c=818Lwpd4-JxtTOeZWSSZlDray0oLp8IcM8h3ycM3A3Y="
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    img.addEventListener('load', () => {
+        ctx.drawImage(img, 0, 0);
+        img.style.display = 'none';
+    });
+    const hoveredColor = document.getElementById('hovered-color');
+    // const selectedColor = document.getElementById('selected-color');
+
+    const canvas2 = document.getElementById('canvas2');
+    const ctx2 = canvas2.getContext('2d');
+    img2.addEventListener('load', () => {
+        ctx2.drawImage(img2, 0, 0);
+        img2.style.display = 'none';
+    });
+
+
+    function replaceBG(event) {
+        for(i=0;i<1000;i+=10) {
+            // console.log(ctx.getImageData(100 + i, 100, 1, 1))
+            let pixel2 = ctx.getImageData(i, 100, 1, 1)
+            const imgData = pixel2.data;
+            const rgba = `rgba(${imgData[0]}, ${imgData[1]}, ${imgData[2]}, ${imgData[3] / 255})`;
+            console.log(rgba)
+            for (let k = 0; k < imgData.length; k += 4) {
+                const red = imgData[k + 0];
+                const green = imgData[k + 1];
+                const blue = imgData[k + 2];
+                // if (green > red && green > blue) {
+                    console.log('gren found')
+                    imgData[0] = 0
+                    imgData[1] = 0
+                    imgData[2] = 0
+                    ctx.putImageData(pixel2, 1, 1);
+                // }
+            }
+        }
+
+        // for(let i=0;i<img2.width;i++) {
+        //     for(let j=0;j<img2.height;j++) {
+        //         const pixel = ctx.getImageData(i, j, 1, 1);
+        //         const pixel2 = ctx2.getImageData(i, j, 1, 1);
+        //         const imgData = pixel2.data;
+        //         console.log(imgData)
+        //         for (let k = 0; k < imgData.length; k += 4) {
+        //             const red = imgData[k + 0];
+        //             const green = imgData[k + 1];
+        //             const blue = imgData[k + 2];
+        //             if (green > red && green > blue) {
+        //                 ctx2.putImageData(pixel, 1, 1);
+
+        //                 // imgData[i + 0] = 255;
+        //                 // imgData[i + 1] = 255;
+        //                 // imgData[i + 2] = 255;
+        //                 // const imgData = frame.data;
+
+        //             }
+        //         }
+        //     }
+        // }
+
+        // return rgba;
+    }
+
+    function replaceBG(event) {
+        const translate = 200
+        const frame = ctx.getImageData(img2.width/4, img2.height/4, img.width, img.height);
+        const imgData = frame.data;
+        const frame2 = ctx2.getImageData(0, 0, img2.width, img2.height);
+        const imgData2 = frame2.data;
+
+        for (let i = 0; i < imgData2.length; i += 4) {
+            const red = imgData2[i + 0];
+            const green = imgData2[i + 1];
+            const blue = imgData2[i + 2];
+            const alpha = imgData2[i + 3];
+            if (green > red && green > blue) {
+                imgData2[i + 0] = imgData[i + 0];
+                imgData2[i + 1] = imgData[i + 1];
+                imgData2[i + 2] = imgData[i + 2];
+            }
+        }
+        ctx2.putImageData(frame2, 0, 0);
+    }
+
+console.log(img.width, img.height)
+console.log(img2.width, img2.height)
+    canvas.addEventListener('click', event => replaceBG(event));
+</script>
+
+</html>

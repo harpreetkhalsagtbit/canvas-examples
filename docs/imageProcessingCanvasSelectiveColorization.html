@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selective Colorization</title>
+</head>
+
+<body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <script type="text/javascript">
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        // img.src = 'path/to/your/image.jpg'; // Replace with your image path
+        img.crossOrigin = 'anonymous';
+        img.src = 'https://www.shutterstock.com/shutterstock/videos/1091851087/thumb/8.jpg?ip=x480';
+        // img.src="https://rukminim2.flixcart.com/image/850/1000/xif0q/reflector/d/g/u/wsgreen6thick812-windrop-solutions-original-imaggsh3ymrh3gjv.jpeg?q=20&crop=false"
+        img.src = 'https://cdn.pixabay.com/photo/2022/02/15/13/00/building-7014904_1280.jpg';
+
+        img.onload = function () {
+            // Draw the image onto the canvas
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            // Get the image data from the canvas
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+
+            // Define the region for selective colorization
+            const startX = 100, startY = 100, endX = 300, endY = 300;
+
+            // Loop through each pixel
+            for (let y = 0; y < canvas.height; y++) {
+                for (let x = 0; x < canvas.width; x++) {
+                    const index = (y * canvas.width + x) * 4;
+                    const red = data[index];
+                    const green = data[index + 1];
+                    const blue = data[index + 2];
+
+                    if (x < startX || x > endX || y < startY || y > endY) {
+                        // Convert to grayscale
+                        const grayscale = red * 0.3 + green * 0.59 + blue * 0.11;
+                        data[index] = grayscale;
+                        data[index + 1] = grayscale;
+                        data[index + 2] = grayscale;
+                    }
+                }
+            }
+
+            // Put the manipulated image data back onto the canvas
+            ctx.putImageData(imageData, 0, 0);
+        };
+
+    </script>
+</body>
+
+</html>
