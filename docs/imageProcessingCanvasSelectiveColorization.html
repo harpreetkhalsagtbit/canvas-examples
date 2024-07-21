@@ -8,52 +8,123 @@
 </head>
 
 <body>
-    <canvas id="canvas" width="800" height="600"></canvas>
+    <h2>Click anywhere on the image or click on the button below - Selective Colorization - Canvas API</h2>
+    <canvas id="canvas" width="600" height="800"></canvas>
+    <canvas id="canvas2" width="600" height="800"></canvas>
+    <canvas id="canvas3" width="600" height="800"></canvas>
+    <input type="button" value="Click here for Selective Colorization" onclick="handle()" />
     <script type="text/javascript">
 
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
+        const canvas2 = document.getElementById('canvas2');
+        const ctx2 = canvas2.getContext('2d');
+        const canvas3 = document.getElementById('canvas3');
+        const ctx3 = canvas3.getContext('2d');
+
         const img = new Image();
-        // img.src = 'path/to/your/image.jpg'; // Replace with your image path
         img.crossOrigin = 'anonymous';
-        img.src = 'https://www.shutterstock.com/shutterstock/videos/1091851087/thumb/8.jpg?ip=x480';
-        // img.src="https://rukminim2.flixcart.com/image/850/1000/xif0q/reflector/d/g/u/wsgreen6thick812-windrop-solutions-original-imaggsh3ymrh3gjv.jpeg?q=20&crop=false"
-        img.src = 'https://cdn.pixabay.com/photo/2022/02/15/13/00/building-7014904_1280.jpg';
+        img.src = '/assets/london-double-decker-bus-round-icon-with-cityscape-vector-illustration-graphic-design-RA1KCW.jpg';
 
-        img.onload = function () {
-            // Draw the image onto the canvas
+        const img2 = new Image();
+        img2.crossOrigin = 'anonymous';
+        img2.src="/assets/pngtree-colorful-paint-splashes-on-transparent-background-png-image_5682147.jpeg"
+
+        const img3 = new Image();
+        img3.crossOrigin = 'anonymous';
+        img3.src = "/assets/il_fullxfull.3633686872_fgb2.avif"
+
+        img.addEventListener('load', () => {
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        });
 
-            // Get the image data from the canvas
+        img2.addEventListener('load', () => {
+            ctx2.drawImage(img2, 0, 0, canvas2.width, canvas2.height);
+        });
+
+        img3.addEventListener('load', () => {
+            ctx3.drawImage(img3, 0, 0, canvas3.width, canvas3.height);
+        });
+
+        const applySelectiveColorization = (ctx, targetColor) => {
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
+            const tolerance = 40; // Tolerance for color matching
 
-            // Define the region for selective colorization
-            const startX = 100, startY = 100, endX = 300, endY = 300;
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
 
-            // Loop through each pixel
-            for (let y = 0; y < canvas.height; y++) {
-                for (let x = 0; x < canvas.width; x++) {
-                    const index = (y * canvas.width + x) * 4;
-                    const red = data[index];
-                    const green = data[index + 1];
-                    const blue = data[index + 2];
-
-                    if (x < startX || x > endX || y < startY || y > endY) {
-                        // Convert to grayscale
-                        const grayscale = red * 0.3 + green * 0.59 + blue * 0.11;
-                        data[index] = grayscale;
-                        data[index + 1] = grayscale;
-                        data[index + 2] = grayscale;
-                    }
+                if (!isColorMatch(r, g, b, targetColor, tolerance)) {
+                    const grayscale = r * 0.3 + g * 0.59 + b * 0.11;
+                    data[i] = grayscale;
+                    data[i + 1] = grayscale;
+                    data[i + 2] = grayscale;
                 }
             }
 
-            // Put the manipulated image data back onto the canvas
             ctx.putImageData(imageData, 0, 0);
         };
 
+        const isColorMatch = (r, g, b, targetColor, tolerance) => {
+            const dr = Math.abs(r - targetColor.r);
+            const dg = Math.abs(g - targetColor.g);
+            const db = Math.abs(b - targetColor.b);
+            return (dr + dg + db) / 3 <= tolerance;
+        };
+
+        function pick(event, canvas) {
+            const ctx = canvas.getContext('2d');
+            const bounding = canvas.getBoundingClientRect();
+            const x = event.clientX - bounding.left;
+            const y = event.clientY - bounding.top;
+            const pixel = ctx.getImageData(x, y, 1, 1);
+            const data = pixel.data;
+            console.log(data)
+            applySelectiveColorization(ctx, {
+                r: data[0],
+                g: data[1],
+                b: data[2],
+            })
+        }
+
+        function hoverHandler(event, ctx) {
+            const bounding = canvas.getBoundingClientRect();
+            const x = event.clientX - bounding.left;
+            const y = event.clientY - bounding.top;
+            const pixel = ctx.getImageData(x, y, 1, 1);
+            const data = pixel.data;
+            return data;
+        }
+
+        function handle() {
+            applySelectiveColorization(ctx, {
+                r: 183,
+                g: 1,
+                b: 23,
+            })
+            applySelectiveColorization(ctx2, {
+                r: 0,
+                g: 208,
+                b: 255,
+            })
+            applySelectiveColorization(ctx3, {
+                r: 183,
+                g: 1,
+                b: 23,
+            })
+        }
+
+
+        canvas.addEventListener('click', event => pick(event, canvas));
+        canvas2.addEventListener('click', event => pick(event, canvas2));
+        canvas3.addEventListener('click', event => pick(event, canvas3));
+
+        canvas.addEventListener('mousemove', event => hoverHandler(event, ctx));
+        canvas2.addEventListener('mousemove', event => hoverHandler(event, ctx2));
+        canvas3.addEventListener('mousemove', event => hoverHandler(event, ctx3));
     </script>
-</body>
+    </body>
 
 </html>
