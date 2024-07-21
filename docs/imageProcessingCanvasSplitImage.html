@@ -6,52 +6,53 @@
     <title>Color picker | Canvas pixel manipulation</title>
 
     <style>
-        .color-cell {
-            color: white;
-            text-align: center;
-        }
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-        th {
-            width: 150px;
-        }
+    .two-columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+    }
 
-        #canvas {
-            display: none;
-        }
+    .split-container {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding-top: 100px;
+    }
+
+    canvas {
+        margin: 4px;
+    }
     </style>
 
 </head>
 
 <body>
-    <canvas id="canvas" width="1200" height="800"></canvas>
-    <table>
-        <thead>
-            <tr>
-                <th>Source</th>
-                <th>Hovered color</th>
-                <th>Selected color</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
+    <h2>Split Image - Canvas API</h2>
+    <div class="">
+        <div class="two-columns">
+            <div>
+                <h2>Original</h2>
+                <canvas id="canvas" width="800" height="800"></canvas>
+            </div>
+            <div>
+                <h2>Split</h2>
+                <div class="two-columns">
                     <canvas id="canvas1" width="400" height="300"></canvas>
-                </td>
-                <td>
                     <canvas id="canvas2" width="400" height="300"></canvas>
-                </td>
-            </tr>
-            <tr>
-                <td>
                     <canvas id="canvas3" width="400" height="300"></canvas>
-                </td>
-                <td>
                     <canvas id="canvas4" width="400" height="300"></canvas>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <!-- <script src="color-picker.js"></script> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 </body>
 <script type="text/javascript">
     const img = new Image();
@@ -75,6 +76,8 @@
     img.addEventListener('load', () => {
         ctx.drawImage(img, 0, 0);
         img.style.display = 'none';
+
+        split()
     });
 
 
@@ -91,12 +94,9 @@
         ctx3.putImageData(frame3, 0, 0);
         ctx4.putImageData(frame4, 0, 0);
 
-        // const frame2 = ctx2.getImageData(0, 0, img2.width, img2.height);
-        // const imgData2 = frame2.data;
 
     }
-    console.log(img.width, img.height)
 
+    split();
 </script>
-    <button type="button" onClick="split()">Split</button>
 </html>

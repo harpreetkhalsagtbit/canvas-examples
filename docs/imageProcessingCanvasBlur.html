@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Blur Area of Image</title>
+</head>
+
+<body>
+    <h2>Blur Area - Canvas API</h2>
+    <canvas id="myCanvas" width="1200" height="800"></canvas>
+    <script>
+        const canvas = document.getElementById("myCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.src = 'https://cdn.pixabay.com/photo/2022/02/15/13/00/building-7014904_1280.jpg';
+
+        img.onload = function () {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            blurArea(200, 200, 300, 300, 10); // Blur area starting at (100, 100) with width and height of 200, and blur radius of 5
+        };
+
+        const blurArea = (x, y, width, height, radius) => {
+            const imageData = ctx.getImageData(x, y, width, height);
+            const data = imageData.data;
+            const w = imageData.width;
+            const h = imageData.height;
+
+            const newImageData = new Uint8ClampedArray(data);
+
+            for (let i = 0; i < w; i++) {
+                for (let j = 0; j < h; j++) {
+                    let r = 0, g = 0, b = 0, a = 0, count = 0;
+                    for (let dx = -radius; dx <= radius; dx++) {
+                        for (let dy = -radius; dy <= radius; dy++) {
+                            const xCoord = i + dx;
+                            const yCoord = j + dy;
+                            if (xCoord >= 0 && xCoord < w && yCoord >= 0 && yCoord < h) {
+                                const idx = (yCoord * w + xCoord) * 4;
+                                r += data[idx];
+                                g += data[idx + 1];
+                                b += data[idx + 2];
+                                a += data[idx + 3];
+                                count++;
+                            }
+                        }
+                    }
+                    const idx = (j * w + i) * 4;
+                    newImageData[idx] = r / count;
+                    newImageData[idx + 1] = g / count;
+                    newImageData[idx + 2] = b / count;
+                    newImageData[idx + 3] = a / count;
+                }
+            }
+
+            for (let i = 0; i < data.length; i++) {
+                data[i] = newImageData[i];
+            }
+
+            ctx.putImageData(imageData, x, y);
+        };
+    </script>
+</body>
+
+</html>
