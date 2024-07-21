@@ -1,19 +1,50 @@
 <!DOCTYPE html>
 <html>
-
-<body>
-    <p id="populationIndex">
+    <style>
+        h2 {
+            margin: 0px;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: start;
+        }
         
-    </p>
+        canvas {
+            border: 2px solid rgb(62, 99, 234);
+        }
+    
+        .flex-col {
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+    
+<body>
+    <h2>Conway's Game of Life</h2>
+    <div class="container">
+        <p id="populationIndex">
+    
+        </p>
+        <div>
+            <input type="button" value="Stop" onclick="stop()">
+            <input type="button" value="Start" onclick="start()">
+            <input type="button" value="RandomBirthsAndDeaths" onclick="randomMultipleDeathAndBirth()">
+            <input type="button" value="RandomBirths" onclick="randomMultipleBirth()">
+            <input type="button" value="RandomDeaths" onclick="randomMultipleDeath()">
+            <span><b>Hover over grid for more randomness</b></span>
+        </div>
+    </div>
 
-    <input type="button" value="Stop" onclick="stop()">
-    <input type="button" value="Start" onclick="start()">
-    <input type="button" value="Random" onclick="randomDeathAndBirth()">
-    <input type="button" value="RandomBirthsAndDeaths" onclick="randomMultipleDeathAndBirth()">
-    <input type="button" value="RandomBirths" onclick="randomMultipleDeath()">
-    <input type="button" value="RandomDeaths" onclick="randomMultipleBirth()">
 
-    <canvas id="myCanvas" width="1800" height="1000" style="border:1px solid #d3d3d3;">
+
+    <canvas id="myCanvas" width="1800" height="900">
         Your browser does not support the HTML canvas tag.</canvas>
 
     <script>
@@ -21,54 +52,20 @@
         var ctx = c.getContext("2d");
         // ctx.lineWidth = 5;
 
-        const width=1800;
-        const height=900;
-        const cellSize=10;
-        const rows=width/cellSize;
-        const cols=height/cellSize;
+        const width = 1800;
+        const height = 900;
+        const cellSize = 10;
+        const rows = width / cellSize;
+        const cols = height / cellSize;
         const cells = rows * cellSize;
         let myGrid = new Array(rows).fill(0).map(() => new Array(cols).fill(0));
         let updatedGrid = new Array(rows).fill(0).map(() => new Array(cols).fill(0));
 
-        const speciesToIdentity= {
-            dog: 'brown',
-            fish: 'silver',
-            cat: 'black',
-            rats: 'grey',
-            pigeon: 'purple',
-            lion: 'yellow',
-            sharks: 'magenta',
-            cow: 'green',
-            male: 'blue',
-            female: 'pink',
-            eagle: 'orange',
-            frogs: 'golden'
-        }
-        const identityToSpecies= {
-            'brown': 'dog',
-            'silver': 'fish',
-            'black': 'cat',
-            'grey': 'rats',
-            'purple': 'pigeon',
-            'yellow': 'lion',
-            'magenta': 'sharks',
-            'green': 'cow',
-            'blue': 'male',
-            'pink': 'female',
-            'orange': 'eagle',
-            'golden': 'frogs'
-        }
-        const speciesList = Object.keys(speciesToIdentity)
-        let speciesPopulation = {}
-
-        // const species = ["dog","fish","cat","rats","pigeon","lion","sharks","cow","male","female","eagle","frogs"]
-        // const speciesIdentity = ["brown","silver","black","grey","purple","yellow","magenta","green","blue","pink","orange","golden"]
-        // let speciesPopulation = {};
         function getRandomArbitrary(min, max) {
             return Math.random() * (max - min) + min;
         }
 
-        function drawSquare(x, y, side, fill='white') {
+        function drawSquare(x, y, side, fill = 'white') {
             ctx.beginPath()
 
             ctx.rect(x, y, side, side)
@@ -79,9 +76,10 @@
 
             ctx.closePath()
         }
+
         function initGrid() {
-            for(let i=0;i<rows;i++) {
-                for(let j=0;j<cols;j++) {
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
                     const isAlive = Math.floor(getRandomArbitrary(0, 2));
                     updatedGrid[i][j] = myGrid[i][j] = isAlive;
                 }
@@ -89,44 +87,33 @@
         }
 
         function renderGrid(grid) {
-            speciesPopulation = {};
-            for(let i=0;i<rows;i++) {
-                for(let j=0;j<cols;j++) {
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
                     const isAlive = grid[i][j];
                     let fill = isAlive ? 'black' : 'white'
-                    if(myGrid[i][j] !== updatedGrid[i][j]) {
-                        if(myGrid[i][j] > updatedGrid[i][j]) {
+                    if (myGrid[i][j] !== updatedGrid[i][j]) {
+                        if (myGrid[i][j] > updatedGrid[i][j]) {
                             fill = 'red';
                         } else {
                             fill = 'green';
                         }
-                    } else if(isAlive) {
-                        // const randomSpeciesIndex = Math.floor(getRandomArbitrary(0, speciesList.length));
-                        // const randomSpecies = speciesList[randomSpeciesIndex]
-                        // fill = speciesToIdentity[randomSpecies];
-                        // if(!speciesPopulation[randomSpecies]) {
-                        //     speciesPopulation[randomSpecies] = 0;
-                        // }
-                        // speciesPopulation[randomSpecies]++;
                     }
                     drawSquare(i * cellSize, j * cellSize, cellSize, fill)
-                }            
+                }
             }
-            // Object.keys(speciesPopulation).map(color => {
-            //     const species = identityToSpecies[color];
-            // })
         }
+
         function getNeighbourCount(grid, i, j) {
-            let count=0;
-            for(let m = i-1;m<=i+1;m++) {
-                for(let n = j-1;n<=j+1;n++) {
-                    if(m === i && n === j) {
+            let count = 0;
+            for (let m = i - 1; m <= i + 1; m++) {
+                for (let n = j - 1; n <= j + 1; n++) {
+                    if (m === i && n === j) {
                         continue;
                     }
                     // console.log(m+rows, n+cols)
                     const x = (m + rows) % rows;
                     const y = (n + cols) % cols;
-                    
+
                     count += grid[x][y]
                 }
             }
@@ -135,16 +122,16 @@
 
         function gameOfLife(grid) {
             let newGrid = new Array(rows).fill(0).map(() => new Array(cols).fill(0));
-            let on=0, off=0;
-            for(let i=0;i<rows;i++) {
-                for(let j=0;j<cols;j++) {
+            let on = 0, off = 0;
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
                     const isAlive = grid[i][j];
                     const neighbourCount = getNeighbourCount(grid, i, j);
-                    if(!isAlive && neighbourCount === 3) {
+                    if (!isAlive && neighbourCount === 3) {
                         // alive
                         newGrid[i][j] = 1
                     } else {
-                        if(neighbourCount < 2 || neighbourCount > 3) {
+                        if (neighbourCount < 2 || neighbourCount > 3) {
                             // die
                             newGrid[i][j] = 0
                         } else {
@@ -152,7 +139,7 @@
                         }
                     }
                     newGrid[i][j] ? on++ : off++
-                    
+
                 }
             }
             document.getElementById('populationIndex').innerText = `On: ${on}, Off: ${off}`
@@ -166,37 +153,24 @@
 
         initGrid();
         renderGrid(myGrid);
-        let interval = setInterval(() => {
-            updatedGrid = gameOfLife(myGrid);
-            renderGrid(updatedGrid);
-            myGrid=updatedGrid;
-            // randomMultipleDeathAndBirth()
-        }, 100)
+        let interval;
+        start();
 
-        // setInterval(() => {
-        //     let sorted = Object
-        //                         .keys(speciesPopulation)
-        //                         .sort(function(a,b){return speciesPopulation[b]-speciesPopulation[a]})
-        //                         .reduce((acc, key) => {
-        //                             acc[key] = speciesPopulation[key]
-        //                             return acc;
-        //                         }, {})
-        //     document.getElementById('populationIndex').innerText = JSON.stringify(sorted)
-        // }, 3000)
+        function start() {
+            interval = setInterval(() => {
+                updatedGrid = gameOfLife(myGrid);
+                renderGrid(updatedGrid);
+                myGrid = updatedGrid;
+            }, 100)
+        }
 
         function stop() {
             clearInterval(interval)
         }
 
-        function randomDeathAndBirth() {
-            const newX = Math.floor(getRandomArbitrary(0, rows))
-            const newY = Math.floor(getRandomArbitrary(0, cols))
-            updatedGrid[newX][newY] = Math.floor(getRandomArbitrary(0, 2))
-        }
-
         function randomMultipleDeathAndBirth() {
             const randomDeadthAndBirthCount = getRandomArbitrary(0, 100)
-            for(i=0;i<randomDeadthAndBirthCount;i++) {
+            for (i = 0; i < randomDeadthAndBirthCount; i++) {
                 const newX = Math.floor(getRandomArbitrary(0, rows))
                 const newY = Math.floor(getRandomArbitrary(0, cols))
                 updatedGrid[newX][newY] = Math.floor(getRandomArbitrary(0, 2))
@@ -205,7 +179,7 @@
 
         function randomMultipleBirth() {
             const randomDeadthAndBirthCount = getRandomArbitrary(0, 100)
-            for(i=0;i<randomDeadthAndBirthCount;i++) {
+            for (i = 0; i < randomDeadthAndBirthCount; i++) {
                 const newX = Math.floor(getRandomArbitrary(0, rows))
                 const newY = Math.floor(getRandomArbitrary(0, cols))
                 updatedGrid[newX][newY] = 1
@@ -214,36 +188,28 @@
 
         function randomMultipleDeath() {
             const randomDeadthAndBirthCount = getRandomArbitrary(0, 100)
-            for(i=0;i<randomDeadthAndBirthCount;i++) {
+            for (i = 0; i < randomDeadthAndBirthCount; i++) {
                 const newX = Math.floor(getRandomArbitrary(0, rows))
                 const newY = Math.floor(getRandomArbitrary(0, cols))
                 updatedGrid[newX][newY] = 0
             }
         }
 
-        function start() {
-            updatedGrid = gameOfLife(myGrid);
-            renderGrid(updatedGrid);
-            myGrid=updatedGrid;
-        }
-
         window.addEventListener('click', (evt) => {
-            const { clientX, clientY} = evt;
-            const x = Math.floor(clientX/cellSize);
-            const y = Math.floor(clientY/cellSize);
+            const { clientX, clientY } = evt;
+            const x = Math.floor(clientX / cellSize);
+            const y = Math.floor(clientY / cellSize);
             updatedGrid[x][y] = Math.floor(getRandomArbitrary(0, 2))
         })
 
         window.addEventListener('mousemove', (evt) => {
-            const { clientX, clientY} = evt;
-            const x = Math.floor(clientX/cellSize);
-            const y = Math.floor(clientY/cellSize);
+            const { clientX, clientY } = evt;
+            const x = Math.floor(clientX / cellSize);
+            const y = Math.floor(clientY / cellSize);
             updatedGrid[x][y] = Math.floor(getRandomArbitrary(0, 2))
-
-            // randomMultipleDeathAndBirth()
         })
 
-</script>
+    </script>
 </body>
 
 </html>
