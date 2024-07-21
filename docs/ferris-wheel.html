@@ -32,9 +32,28 @@
 </style>
 <body>
     <main>
-        <h2>Svg Line vs Canvas Line</h2>
-        <canvas id="canvas" width="800" height="800" style="border:1px solid #d3d3d3;">
-            Your browser does not support the HTML canvas tag.</canvas>
+        <div class="container">
+            <div class="two-columns">
+                <div>
+                    <h2>Ferris Wheel</h2>
+                    <canvas id="canvas" width="800" height="800" style="border:1px solid #d3d3d3;">
+                        Your browser does not support the HTML canvas tag.</canvas>
+                </div>
+                <div>
+                    <h2>Canvas API</h2>
+                    <ul>
+                        <li>Smooth animation</li>
+                        <li>No DOM manipulation</li>
+                        <li>Performance and Efficient Rendering</li>
+                        <li>Kind of Complex Visuals</li>
+                    </ul>
+                    <input type="button" id="rotateX" onclick="rotateX()" value="Toggle Rotate X">
+                    <input type="button" id="rotateY" onclick="rotateY()" value="Toggle Rotate Y">
+                    <input type="button" id="reset" onclick="resetRotate()" value="Reset">
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <script>
@@ -59,12 +78,17 @@
             ctx.closePath()
         }
 
-        function drawRect(x, y) {
+        function drawRect(x, y, fill) {
             ctx.beginPath();
-            ctx.fillStyle = 'green';
-            ctx.fillRect(x - 20, y - 15, 40, 20);
+            ctx.fillStyle = fill;
+            ctx.fillRect(x - 20, y - 15, 30, 20);
             ctx.stroke();
         }
+
+        function getRandomArbitrary(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
         function any2dShape(x, y, sides = 2, rx = 0, ry = 0, r, rect = false) {
             let px = 0, py = 0;
             let thetaInc = (sides / 2)
@@ -74,14 +98,16 @@
                 let dx = x + r * Math.cos(i + rx);
                 let dy = y + r * Math.sin(i + ry);
                 drawLine(x, y, dx, dy, "green")
-count++
+                drawCircle(px, py, 4, 0, Math.floor(getRandomArbitrary(0, 2)) ? "blue":"red")
+
+                count++
                 if (px && py) {
-                    drawLine(px, py, dx, dy, count % 2 >= 0.5 ? "green":"green")
-                    if(rect)
-                        drawRect(dx, dy)
-                    else 
-                        drawCircle(px, py, 4, 0, count % 2 >= 0.5 ? "green":"red")
-                    // any2dShape(px, py, 3, dx, dy);
+                    drawLine(px, py, dx, dy, "green")
+                    if(rect) {
+                        drawLine(dx, dy, dx+2, dy+30, "green")
+                        drawLine(px, py, dx, dy, "green")
+                        drawRect(dx + 5, dy + 30, count % 2 >= 0.5 ? "green":"red")
+                    }
                 }
                 px = dx;
                 py = dy;
@@ -92,20 +118,35 @@ count++
             ctx.beginPath();
         }
 
+        let angleXInc = 0.01, angleYInc = 0.01
+        function rotateX(evt) {
+            angleXInc = angleXInc === 0.01 ? 0.03 : 0.01
+        }
+
+        function rotateY(evt) {
+            angleYInc = angleYInc === 0.01 ? 0.03 : 0.01
+        }
+
+        function resetRotate(evt) {
+            angleXInc = angleYInc = 0.01
+            rx = ry = 0
+        }
+
         let r = 300;
         let rx = 0;
         let ry = 0;
         let sides= 40;
         setInterval(() => {
             clearScreen();
-            // rx += 0.01 + Math.PI/80
-            // ry += 0.01 + Math.PI/200
-            rx += 0.01
-            ry += 0.01
+            rx += angleXInc
+            ry += angleYInc
             any2dShape(400, 400, sides, rx, ry, r, true);
             any2dShape(400, 400, sides, rx, ry, 150);
         }, 1000/60)
-        // any2dShape(400, 400, sides, rx, ry);
+        rx += 0.01
+        ry += 0.01
+        any2dShape(400, 400, sides, rx, ry, r, true);
+        any2dShape(400, 400, sides, rx, ry, 150);
 
     </script>
 </body>
