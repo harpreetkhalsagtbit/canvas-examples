@@ -19,12 +19,12 @@
 </head>
 
 <body>
+    <h2>Image Manipulation - Canvas API</h2>
     <table>
         <thead>
             <tr>
-                <th>Source</th>
+                <th>Hover over canvas to highlight color & click to remove that color</th>
                 <th>Hovered color</th>
-                <th>Selected color</th>
             </tr>
         </thead>
         <tbody>
@@ -32,8 +32,11 @@
                 <td>
                     <canvas id="canvas" width="900" height="900"></canvas>
                 </td>
-                <td class="color-cell" id="hovered-color"></td>
-                <td class="color-cell" id="selected-color"></td>
+                <td class="color-cell" id="hovered-color">
+                </td>
+                <td class="color-cell" id="selected-color">
+                    <input type="button" id="removeGreen" onclick="removeGreen(event)" value="remove Green">
+                </td>
             </tr>
         </tbody>
     </table>
@@ -59,45 +62,27 @@
         const y = event.clientY - bounding.top;
         const pixel = ctx.getImageData(x, y, 1, 1);
         const data = pixel.data;
-// console.log(data)
+
         const rgba = `rgba(${data[0]}, ${data[1]}, ${data[2]}, ${data[3] / 255})`;
         destination.style.background = rgba;
         destination.textContent = rgba;
-
         return rgba;
     }
 
-    function resetClicked(event) {
+    function removeGreen(event) {
         const bounding = canvas.getBoundingClientRect();
         const x = event.clientX - bounding.left;
         const y = event.clientY - bounding.top;
         const pixel = ctx.getImageData(x, y, 1, 1);
         const data = pixel.data;
-console.log(data)
+
         const rgba = `rgba(${data[0]}, ${data[1]}, ${data[2]}, ${data[3] / 255})`;
-        console.log(rgba)
         const frame = ctx.getImageData(0, 0, img.width, img.height);
         const imgData = frame.data;
         for (let i = 0; i < imgData.length; i += 4) {
             const red = imgData[i + 0];
             const green = imgData[i + 1];
             const blue = imgData[i + 2];
-            // if (green > 150 && red > 150 && blue < 150) {
-            // imgData[i + 3] = 0;
-            // }
-
-            // if (red == data[0]) {
-            //     imgData[i + 0] = 255;
-            // }
-            // if (green == data[1]) {
-            //     imgData[i + 1] = 255;
-            // }
-            // if (blue == data[2]) {
-            //     imgData[i + 2] = 255;
-            // }
-
-            // if (red == data[0] || green == data[1] || blue == data[2]) {
-            // if(green>=219 || red<20 || blue<20) {
             if (green > red && green > blue) {
                 imgData[i + 0] = 255;
                 imgData[i + 1] = 255;
@@ -108,9 +93,36 @@ console.log(data)
         ctx.putImageData(frame, 0, 0);
         return rgba;
     }
+    function removeSelected(event, hoveredColor) {
+        const selected = pick(event, hoveredColor);
+        const pixel = ctx.getImageData(1, 1, 1, 1);
+        const data = pixel.data;
+
+        const rgba = `rgba(${data[0]}, ${data[1]}, ${data[2]}, ${data[3] / 255})`;
+        const frame = ctx.getImageData(0, 0, img.width, img.height);
+        const imgData = frame.data;
+
+        for (let i = 0; i < imgData.length; i += 4) {
+            const red = imgData[i + 0];
+            const green = imgData[i + 1];
+            const blue = imgData[i + 2];
+            const alpha = imgData[i + 3];
+
+            const toMatch = `rgba(${red}, ${green}, ${blue}, ${alpha / 255})`;
+            if (selected === toMatch) {
+                imgData[i + 0] = 255;
+                imgData[i + 1] = 255;
+                imgData[i + 2] = 255;
+            }
+
+        }
+        ctx.putImageData(frame, 0, 0);
+        console.log('done')
+        return rgba;
+    }
+
     canvas.addEventListener('mousemove', event => pick(event, hoveredColor));
-    // canvas.addEventListener('click', event => pick(event, selectedColor));
-    canvas.addEventListener('click', event => resetClicked(event));
+    canvas.addEventListener('click', event => removeSelected(event, hoveredColor));
 </script>
 
 </html>
