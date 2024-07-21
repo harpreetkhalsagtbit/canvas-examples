@@ -1,39 +1,40 @@
 <!DOCTYPE html>
 <html>
-    <style>
-        .container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding-top: 50px;
-        }
-    
-        .two-columns {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            align-items: start;
-        }
-    
-        .line-container {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding-top: 100px;
-        }
-    
-        svg, canvas {
-            border: 2px solid rgb(62, 99, 234);
-        }
-    
-        .flex-col {
-            display: flex;
-            flex-direction: column;
-        }
-    </style>
-    
+<style>
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-top: 50px;
+    }
+
+    .two-columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+    }
+
+    .line-container {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding-top: 100px;
+    }
+
+    svg,
+    canvas {
+        border: 2px solid rgb(62, 99, 234);
+    }
+
+    .flex-col {
+        display: flex;
+        flex-direction: column;
+    }
+</style>
+
 <body>
     <main>
-        <h2>Any shape using Circle Equation - Canvas API</h2>
+        <h2>Any 2D shape using Circle Equation - Canvas API</h2>
         <div class="container">
             <div class="two-columns">
                 <canvas id="myCanvas" width="600" height="600"></canvas>
@@ -99,7 +100,7 @@
             let points = [];
             let initX = x + rx * Math.cos(angleX);
             let initY = y + ry * Math.sin(angleY);
-            
+
             for (let i = 0; i <= Math.PI * 2; i += radianInc) {
                 let dx = x + rx * Math.cos(i + angleX);
                 let dy = y + ry * Math.sin(i + angleY);
@@ -117,9 +118,9 @@
 
         let rx = 200;
         let ry = 200;
-        let sides= 4;
+        let sides = 4;
         const size = 250;
-        let x=250, y=250;
+        let x = 250, y = 250;
         let angleX = 0;
         let angleY = 0;
         let interval = 10;
@@ -150,22 +151,22 @@
         }
 
         function rotateX(evt) {
-            angleXInc = +(document.getElementById("rotateX").value)/100
+            angleXInc = +(document.getElementById("rotateX").value) / 100
             document.getElementById("rotateXLabel").innerHTML = `Rotation Speed X: ${Math.trunc(angleXInc * 100)}`
             clearScreen()
             any2dShape(x, y, sides, rx, ry)
         }
 
         function rotateY(evt) {
-            angleYInc = +(document.getElementById("rotateY").value)/100
+            angleYInc = +(document.getElementById("rotateY").value) / 100
             document.getElementById("rotateYLabel").innerHTML = `Rotation Speed Y: ${Math.trunc(angleYInc * 100)}`
             clearScreen()
             any2dShape(x, y, sides, rx, ry)
         }
 
         function rotateXY(evt) {
-            angleXInc = +(document.getElementById("rotateXY").value)/100
-            angleYInc = +(document.getElementById("rotateXY").value)/100
+            angleXInc = +(document.getElementById("rotateXY").value) / 100
+            angleYInc = +(document.getElementById("rotateXY").value) / 100
             document.getElementById("rotateXYLabel").innerHTML = `Rotation Speed XY: ${Math.trunc(angleXInc * 100)}`
             clearScreen()
             any2dShape(x, y, sides, rx, ry)
@@ -208,7 +209,7 @@
         }
 
         function startStopAnimate() {
-            if(intervalId) {
+            if (intervalId) {
                 clearInterval(intervalId)
                 intervalId = ''
                 document.getElementById("animate").value = 'Start Animation';
@@ -226,10 +227,10 @@
                 angleX += angleXInc
                 angleY += angleYInc
                 any2dShape(x, y, sides, rx, ry);
-            }, 1000/60)
+            }, 1000 / 60)
         }
         animateShape()
-</script>
+    </script>
 </body>
 
 </html>
