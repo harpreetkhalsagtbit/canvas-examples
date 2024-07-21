@@ -32,16 +32,21 @@
 </style>
 <body>
     <main>
-        <h2>Svg Line vs Canvas Line</h2>
-        <canvas id="canvas" width="800" height="800" style="border:1px solid #d3d3d3;">
-            Your browser does not support the HTML canvas tag.</canvas>
+        <h2>Circle using equations - Canvas API</h2>
+        <div class="container">
+            <div class="two-columns">
+                <script src="https://gist.github.com/harpreetkhalsagtbit/e304cb4794d376c3d1404cdae1129304.js"></script>
+                <canvas id="canvas" width="420" height="420" style="border:1px solid #d3d3d3;">
+                    Your browser does not support the HTML canvas tag.</canvas>
+            </div>
+        </div>
+
     </main>
 
     <script>
-        var canvas = document.getElementById('canvas');
-        var ctx = canvas.getContext('2d');
-
-        function drawLine(x1, y1, x2, y2, color) {
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        function drawPixel(x1, y1, x2, y2, color) {
             ctx.beginPath()
             ctx.moveTo(x1, y1)
             ctx.lineTo(x2, y2)
@@ -49,63 +54,28 @@
             ctx.stroke();
             ctx.closePath()
         }
-
-        function drawCircle(x1, y1, x2, y2, color) {
-            ctx.beginPath()
-            ctx.fillStyle = color;
-            ctx.arc(x1, y1, x2, y2, 2 * Math.PI);
-
-            ctx.fill();
-            ctx.closePath()
-        }
-
-        function drawRect(x, y) {
-            ctx.beginPath();
-            ctx.fillStyle = 'green';
-            ctx.fillRect(x - 20, y - 15, 40, 20);
-            ctx.stroke();
-        }
-        function any2dShape(x, y, sides = 2, rx = 0, ry = 0, r, rect = false) {
+        function drawCircleUsingEquation(x, y, sides = 2, rx = 0, ry = 0, r) {
             let px = 0, py = 0;
             let thetaInc = (sides / 2)
             let radianInc = Math.PI / thetaInc;
-            let count = 0;
+            let pixelSize = 1;
+            rx += 0.01
+            ry += 0.01
+
             for (let i = 0; i <= Math.PI * 2; i += radianInc) {
-                let dx = x + r * Math.cos(i + rx);
-                let dy = y + r * Math.sin(i + ry);
-                drawLine(x, y, dx, dy, "green")
-count++
-                if (px && py) {
-                    drawLine(px, py, dx, dy, count % 2 >= 0.5 ? "green":"green")
-                    if(rect)
-                        drawRect(dx, dy)
-                    else 
-                        drawCircle(px, py, 4, 0, count % 2 >= 0.5 ? "green":"red")
-                    // any2dShape(px, py, 3, dx, dy);
-                }
+                let dx = x + r * Math.sin(i + rx);
+                let dy = y + r * Math.cos(i + ry);
+                drawPixel(dx + pixelSize, dy + pixelSize, dx, dy, Math.trunc(i % 2) === 0 ? "red":"blue")
                 px = dx;
                 py = dy;
             }
         }
-        function clearScreen() {
-            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-            ctx.beginPath();
-        }
 
-        let r = 300;
-        let rx = 0;
-        let ry = 0;
-        let sides= 40;
-        setInterval(() => {
-            clearScreen();
-            // rx += 0.01 + Math.PI/80
-            // ry += 0.01 + Math.PI/200
-            rx += 0.01
-            ry += 0.01
-            any2dShape(400, 400, sides, rx, ry, r, true);
-            any2dShape(400, 400, sides, rx, ry, 150);
-        }, 1000/60)
-        // any2dShape(400, 400, sides, rx, ry);
+        const rx = 0;
+        const ry = 0;
+        const r = 200;
+        const sides = 360;
+        drawCircleUsingEquation(210, 210, sides, rx, ry, r, true);
 
     </script>
 </body>

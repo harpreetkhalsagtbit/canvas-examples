@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+    <style>
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-top: 50px;
+        }
+    
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: start;
+        }
+    
+        .line-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-top: 100px;
+        }
+    
+        svg, canvas {
+            border: 2px solid rgb(62, 99, 234);
+        }
+    
+        .flex-col {
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+    
+<body>
+    <main>
+        <h2>Any 3D shape using Circle Equation - Canvas API</h2>
+        <div class="container">
+            <div class="two-columns">
+                <canvas id="myCanvas" width="600" height="600"></canvas>
+                <div class="flex-col">
+                    <h3>Controls</h3>
+                    <label id="sidesLabel">Sides</label>
+                    <input type="range" id="sides" min="2" max="25" onchange="changeSides()">
+                    <label id="widthLabel">Width</label>
+                    <input type="range" id="width" min="100" max="200" onchange="changeWidth()">
+                    <label id="rotateXLabel">Rotation Speed X</label>
+                    <input type="range" id="rotateX" min="1" max="50" step="1" onchange="rotateX()">
+                    <label id="rotateYLabel">Rotation Speed Y</label>
+                    <input type="range" id="rotateY" min="1" max="50" step="1" onchange="rotateY()">
+                    <label id="rotateXYLabel">Rotation Speed XY</label>
+                    <input type="range" id="rotateXY" min="1" max="50" onchange="rotateXY()">
+                    <label id="translateXLabel">Translate X</label>
+                    <input type="range" id="translateX" min="0" max="360" onchange="translateX()">
+                    <label id="translateYLabel">Translate Y</label>
+                    <input type="range" id="translateY" min="0" max="360" onchange="translateY()">
+                    <label id="scaleXLabel">Scale X</label>
+                    <input type="range" id="scaleX" min="0" max="360" onchange="scaleX()">
+                    <label id="scaleYLabel">Scale Y</label>
+                    <input type="range" id="scaleY" min="0" max="360" onchange="scaleY()">
+                    <label id="scaleXYLabel">Scale XY</label>
+                    <input type="range" id="scaleXY" min="0" max="360" onchange="scaleXY()">
+
+
+                    <input type="button" id="animate" value="Stop Animation" onclick="startStopAnimate()">
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        var c = document.getElementById("myCanvas");
+        var ctx = c.getContext("2d");
+        ctx.lineWidth = 5;
+        let angleXInc = 0.01;
+        let angleYInc = 0.01;
+        function drawLine(x1, y1, x2, y2, color) {
+            ctx.beginPath()
+            ctx.moveTo(x1, y1)
+            ctx.lineTo(x2, y2)
+            ctx.strokeStyle = color;
+            ctx.stroke();
+            ctx.closePath()
+        }
+
+        function clearScreen() {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            ctx.beginPath();
+        }
+
+        const x0 = 400, y0 = 300;
+        let r = 200;
+        const theta = Math.PI / 4;
+
+        // any 2d shape - square
+        function any3dShape(x, y, sides = 2, rx = 0, ry = 0) {
+            let px = 0, py = 0;
+            let thetaInc = (sides / 2)
+            let radianInc = (2 * Math.PI) / sides;
+            let count = 0;
+            let initX = x + rx * Math.cos(angleX);
+            let initY = y + ry * Math.sin(angleY);
+            
+            for (let i = 0; i <= Math.PI * 2; i += radianInc) {
+                let dx = x + rx * Math.cos(i + angleX);
+                let dy = y + ry * Math.sin(i + angleY);
+                count++
+                if (px && py) {
+                    drawLine(px, py, dx, dy, count % 2 >= 0.5 ? "green" : "red")
+
+                    drawLine(px, py, px + width, py + width, "pink")
+
+                    drawLine(px + width, py + width, dx + width, dy + width, count % 2 >= 0.5 ? "green":"red")
+
+                }
+                px = dx;
+                py = dy;
+            }
+
+            // close the shape
+            drawLine(px, py, initX, initY, "blue")
+        }
+
+        let rx = 200;
+        let ry = 200;
+        let sides= 4;
+        let width= 100;
+        const size = 250;
+        let x=250, y=250;
+        let angleX = 0;
+        let angleY = 0;
+        let interval = 10;
+
+        document.getElementById("sides").value = sides;
+        document.getElementById("width").value = width;
+        document.getElementById("rotateX").value = angleXInc;
+        document.getElementById("rotateY").value = angleYInc;
+        document.getElementById("translateX").value = x;
+        document.getElementById("translateY").value = y;
+        document.getElementById("scaleX").value = rx;
+        document.getElementById("scaleY").value = ry;
+
+        document.getElementById("sidesLabel").innerHTML = `Sides: ${sides}`;
+        document.getElementById("widthLabel").innerHTML = `Width: ${width}`;
+        document.getElementById("rotateXLabel").innerHTML = `Rotation Speed X: ${Math.trunc(angleXInc * 100)}`;
+        document.getElementById("rotateYLabel").innerHTML = `Rotation Speed Y: ${Math.trunc(angleYInc * 100)}`;
+        document.getElementById("translateXLabel").innerHTML = `Translate X: ${x}`;
+        document.getElementById("translateYLabel").innerHTML = `Translate Y: ${y}`;
+        document.getElementById("scaleXLabel").innerHTML = `Scale X: ${rx}`;
+        document.getElementById("scaleYLabel").innerHTML = `Scale Y: ${ry}`;
+
+        any3dShape(x, y, sides, rx, ry)
+
+        function changeSides(evt) {
+            sides = document.getElementById("sides").value
+            document.getElementById("sidesLabel").innerHTML = `Sides: ${sides}`
+            clearScreen()
+            any3dShape(x, y, sides, rx, ry)
+        }
+
+        function changeWidth(evt) {
+            width = +document.getElementById("width").value
+            document.getElementById("widthLabel").innerHTML = `Width: ${width}`
+            clearScreen()
+            any3dShape(x, y, sides, rx, ry)
+        }
+
+        function rotateX(evt) {
+            angleXInc = +(document.getElementById("rotateX").value)/100
+            document.getElementById("rotateXLabel").innerHTML = `Rotation Speed X: ${Math.trunc(angleXInc * 100)}`
+            clearScreen()
+            any3dShape(x, y, sides, rx, ry)
+        }
+
+        function rotateY(evt) {
+            angleYInc = +(document.getElementById("rotateY").value)/100
+            document.getElementById("rotateYLabel").innerHTML = `Rotation Speed Y: ${Math.trunc(angleYInc * 100)}`
+            clearScreen()
+            any3dShape(x, y, sides, rx, ry)
+        }
+
+        function rotateXY(evt) {
+            angleXInc = +(document.getElementById("rotateXY").value)/100
+            angleYInc = +(document.getElementById("rotateXY").value)/100
+            document.getElementById("rotateXYLabel").innerHTML = `Rotation Speed XY: ${Math.trunc(angleXInc * 100)}`
+            clearScreen()
+            any3dShape(x, y, sides, rx, ry)
+        }
+
+        function translateX(evt) {
+            x = +document.getElementById("translateX").value
+            document.getElementById("translateXLabel").innerHTML = `Translate X: ${x}`
+            clearScreen()
+            any3dShape(x, y, sides, rx, ry)
+        }
+
+        function translateY(evt) {
+            y = +document.getElementById("translateY").value
+            document.getElementById("translateYLabel").innerHTML = `Translate Y: ${x}`
+            clearScreen()
+            any3dShape(x, y, sides, rx, ry)
+        }
+
+        function scaleX(evt) {
+            rx = +document.getElementById("scaleX").value
+            document.getElementById("scaleXLabel").innerHTML = `Scale X: ${rx}`
+            clearScreen()
+            any3dShape(x, y, sides, rx, ry)
+        }
+
+        function scaleY(evt) {
+            ry = +document.getElementById("scaleY").value
+            document.getElementById("scaleYLabel").innerHTML = `Scale Y: ${ry}`
+            clearScreen()
+            any3dShape(x, y, sides, rx, ry)
+        }
+
+        function scaleXY(evt) {
+            rx = +document.getElementById("scaleXY").value
+            ry = +document.getElementById("scaleXY").value
+            document.getElementById("scaleXYLabel").innerHTML = `Scale XY: ${rx}`
+            clearScreen()
+            any3dShape(x, y, sides, rx, ry)
+        }
+
+        function startStopAnimate() {
+            if(intervalId) {
+                clearInterval(intervalId)
+                intervalId = ''
+                document.getElementById("animate").value = 'Start Animation';
+            } else {
+                animateShape()
+                document.getElementById("animate").value = 'Stop Animation';
+            }
+        }
+
+        let intervalId;
+        let toggleAnimate = false;
+        function animateShape() {
+            intervalId = setInterval(() => {
+                clearScreen();
+                angleX += angleXInc
+                angleY += angleYInc
+                any3dShape(x, y, sides, rx, ry);
+            }, 1000/60)
+        }
+        animateShape()
+</script>
+</body>
+
+</html>
